@@ -6,6 +6,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.widget.Toast
+import java.net.UnknownServiceException
 
 val DATABASE_NAME = "MyDB"
 val TABLE_NAME = "Users"
@@ -54,14 +55,11 @@ class DataBaseHandler (var context : Context) : SQLiteOpenHelper(context, DATABA
     fun checkLogin(username: String, password: String): Boolean{
         val db = this.writableDatabase
 
-        val search = "SELECT * FROM $TABLE_NAME WHERE $COL_NAME = '$username' AND $COL_PASSWORD = '$password'"
+        val search = "SELECT * FROM $TABLE_NAME WHERE $COL_NICKNAME = '$username' AND $COL_PASSWORD = '$password'"
 
         val cursor = db.rawQuery(search,null)
 
-        val long: Long = -1
-
         if (cursor.moveToFirst()){
-
             Toast.makeText(context, "Welcome, $username", Toast.LENGTH_LONG).show()
             return true
         }
@@ -69,5 +67,48 @@ class DataBaseHandler (var context : Context) : SQLiteOpenHelper(context, DATABA
         cursor?.close()
         db.close()
         return false
+    }
+
+    fun checkExistingUser(username: String): Boolean{
+        val db = this.writableDatabase
+
+        val search = "SELECT * FROM $TABLE_NAME WHERE $COL_NICKNAME = '$username'"
+
+        val cursor = db.rawQuery(search,null)
+
+        if (cursor.moveToFirst()){
+            Toast.makeText(context, "User exists", Toast.LENGTH_LONG).show()
+            return true
+        }
+
+        cursor?.close()
+        db.close()
+        return false
+    }
+
+    @SuppressLint("Recycle")
+    fun getUserData(username: String): User? {
+        val db = this.writableDatabase
+
+        val search = "SELECT * FROM $TABLE_NAME WHERE $COL_NICKNAME = '$username'"
+
+        val cursor = db.rawQuery(search,null)
+
+        if (cursor.moveToFirst()){
+            val id = cursor.getString(cursor.getColumnIndex(COL_ID)).toInt()
+            val name = cursor.getString(cursor.getColumnIndex(COL_NAME))
+            val surname = cursor.getString(cursor.getColumnIndex(COL_SURNAME))
+            val userName = cursor.getString(cursor.getColumnIndex(COL_NICKNAME))
+            val password = cursor.getString(cursor.getColumnIndex(COL_PASSWORD))
+
+            val user = User(name, surname, userName, password)
+            user.id = id
+
+            return user
+        }
+
+        cursor?.close()
+        db.close()
+        return null
     }
 }

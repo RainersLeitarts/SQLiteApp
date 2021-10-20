@@ -19,16 +19,28 @@ class MainActivity : AppCompatActivity() {
         val password2 = findViewById<EditText>(R.id.reenter_password_text)
         val registerBtn = findViewById<Button>(R.id.register_btn)
         val loginBtn = findViewById<Button>(R.id.register_login_button)
+        val AESCrypt = AESCrypt()
+        val db = DataBaseHandler(this)
 
         registerBtn.setOnClickListener {
+            //Checks if fields are not empty
             if(nameText.text.toString().isNotEmpty() && surnameText.text.toString().isNotEmpty() && nicknameText.text.toString().isNotEmpty() && password1.text.toString().isNotEmpty()){
-                if (password1.text.toString() == password2.text.toString()){
-                    val user = User(nameText.text.toString(), surnameText.text.toString(), nicknameText.text.toString(), password1.text.toString())
-                    val db = DataBaseHandler(this)
-                    db.insertData(user)
-                    Toast.makeText(this, "User Added", Toast.LENGTH_SHORT).show()
-                }else{
-                    Toast.makeText(this, "Passwords don't match", Toast.LENGTH_SHORT).show()
+                //checks if User with that username exists
+                if (!db.checkExistingUser(nicknameText.text.toString())) {
+                    //checks if passwords match
+                    if (password1.text.toString() == password2.text.toString()) {
+                        val encryptedPassword = AESCrypt.encrypt(password1.text.toString())
+                        val user = User(
+                            nameText.text.toString(),
+                            surnameText.text.toString(),
+                            nicknameText.text.toString(),
+                            encryptedPassword
+                        )
+                        db.insertData(user)
+                        Toast.makeText(this, "User Added", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this, "Passwords don't match", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }else{
                 Toast.makeText(this, "Fill all fields", Toast.LENGTH_SHORT).show()

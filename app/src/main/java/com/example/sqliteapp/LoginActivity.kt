@@ -16,14 +16,19 @@ class LoginActivity : AppCompatActivity() {
         val registerBtn = findViewById<Button>(R.id.login_register_button)
         val usernameText = findViewById<EditText>(R.id.login_username_text)
         val passwordText = findViewById<EditText>(R.id.login_password_text)
+        val AESCrypt = AESCrypt()
 
         loginBtn.setOnClickListener {
+
             val username = usernameText.text.toString()
-            val password = passwordText.text.toString()
+
+            val password = AESCrypt.encrypt(passwordText.text.toString())
+            println(password)
             val db = DataBaseHandler(this)
 
             if (db.checkLogin(username, password)){
                 val intent = Intent(this, LoggedInActivity::class.java)
+                intent.putExtra("loggedInUser", username)
                 startActivity(intent)
             }else{
                 Toast.makeText(this, "Enter correct credentials", Toast.LENGTH_LONG).show()
