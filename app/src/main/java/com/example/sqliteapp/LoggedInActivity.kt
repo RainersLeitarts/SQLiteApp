@@ -1,6 +1,7 @@
 package com.example.sqliteapp
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -25,6 +26,9 @@ class LoggedInActivity : AppCompatActivity() {
         val surnameTextView = findViewById<TextView>(R.id.surname_textview)
         val usernameTextView = findViewById<TextView>(R.id.username_textview)
         val passwordTextView = findViewById<TextView>(R.id.password_textview)
+
+        val btnMaps = findViewById<Button>(R.id.btn_maps)
+
         var showingInfo: Boolean = false
 
         profileIcon.setOnClickListener{
@@ -55,6 +59,11 @@ class LoggedInActivity : AppCompatActivity() {
                 passwordTextView.text = "PASSWORD: $decryptedPassword"
                 showingInfo = true
             }
+        }
+
+        btnMaps.setOnClickListener {
+            val intent = Intent(this, MapsActivity::class.java)
+            startActivity(intent)
         }
     }
 }
